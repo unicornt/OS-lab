@@ -25,6 +25,20 @@ static uint64_t *
 pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
 {
     /* TODO: Your code here. */
+    if(va >= (1 << 50)) panic("virtual memory limit exceed");
+    for(int level = 0; level < 4; level++) {
+        uint64_t *pte = &pgdir[PTX(level, va)]; // pte point to target entry in this page
+        if(*pte & PTE_P) { // check valid
+            pgdir = (uint64_t*) P2V(PTE_ADDR(*pte));
+        }
+        else {
+            char* p;
+            if(alloc == 0 || (p = kalloc()) == 0) return NULL;
+            memset(p, 0, PGSIZE);
+            pgdir = (uint64_t*) P2V(*p);
+        }
+    }
+    /* My code ends. */
 }
 
 /*
