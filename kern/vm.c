@@ -25,7 +25,7 @@ static uint64_t *
 pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
 {  //pgdir point to the start entry of given page table
     /* TODO: Your code here. */
-    if((uint64_t*)va >= (1L << 50)) panic("virtual memory limit exceed");
+    if((uint64_t)va >= (1L << 50)) panic("virtual memory limit exceed");
     for(int level = 0; level < 4; level++) {
         uint64_t *pte = &pgdir[PTX(level, va)]; // pte point to target entry in this page table
         if(*pte & PTE_P) { // check valid
@@ -37,7 +37,7 @@ pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
             *pte = V2P(*pgdir) | PTE_P | PTE_RW | PTE_USER;
         }
     }
-    return &pgdir[RTX(4, va)];
+    return &pgdir[PTX(4, va)];
     /* My code ends. */
 }
 
@@ -58,7 +58,7 @@ map_region(uint64_t *pgdir, void *va, uint64_t size, uint64_t pa, int64_t perm)
     char* endp = ROUNDDOWN(va + size - 1, PGSIZE);
     for(char* i = startp; i <= endp; i += PGSIZE, pa += PGSIZE) {
         uint64_t *pte = pgdir_walk(pgdir, i, 1);
-        if(*pte & PTE_P) painc("map to an alloced region");
+        if(*pte & PTE_P) panic("map to an alloced region");
         *pte = pa | perm | PTE_P;
     }
     return 0;
@@ -75,6 +75,20 @@ void
 vm_free(uint64_t *pgdir, int level)
 {
     /* TODO: Your code here. */
-
+    if(pgdir == 0) panic("pgdir not found");
+    if(level < 5) {
+        for(int i = 0; i < PGSIZE; i++) {
+            if(pgdir[i] & PTE_P) {
+                vm_free(P2V(PTE_ADDR(pgdir[i])), level + 1);
+            }
+        }
+    }
+    else {
+        for(int i = 0; i < PGSIZE; i++) {
+            char* v = P2V(PTE_ADDR(pgdir[i]));
+            kfree(v);
+        }
+    }
+    kfree(pgdir);
     /* My code ends */
 }
