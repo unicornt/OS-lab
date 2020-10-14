@@ -21,5 +21,6 @@ main()
     alloc_init();
     cprintf("Allocator: Init success.\n");
     check_free_list();
+    char *p = kalloc();
     while (1) ;
 }
