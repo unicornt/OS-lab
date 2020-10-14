@@ -85,7 +85,7 @@ vm_free(uint64_t *pgdir, int level)
     }
     else {
         for(int i = 0; i < PGSIZE; i++) {
-            char* v = P2V(PTE_ADDR(pgdir[i]));
+            char* v = &pgdir[i];
             kfree(v);
         }
     }
