@@ -59,7 +59,7 @@ map_region(uint64_t *pgdir, void *va, uint64_t size, uint64_t pa, int64_t perm)
     for(char* i = startp; i <= endp; i += PGSIZE, pa += PGSIZE) {
         uint64_t *pte = pgdir_walk(pgdir, i, 1);
         if(*pte & PTE_P) panic("map to an alloced region");
-        *pte = pa | perm | PTE_P;
+        *pte = pa | perm | PTE_P | PTE_TABLE | PTE_AF;
     }
     return 0;
     /* My code ends */
