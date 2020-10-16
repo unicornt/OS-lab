@@ -3,6 +3,9 @@
 #include "string.h"
 #include "console.h"
 #include "kalloc.h"
+#include "kpgdir.c"
+#include "kalloc.h"
+#include "vm.h"
 
 void
 main()
@@ -21,6 +24,10 @@ main()
     alloc_init();
     cprintf("Allocator: Init success.\n");
     check_free_list();
-    char *p = kalloc();
+    uint64_t *p = kalloc();
+    map_region(kpgdir, 0, 1024, p, 0);
+    cprintf("%d %d\n", *pgdir_walk(kpgdir, p, 0), *p);
+    vm_free(kpgdir, 0);
+    cprintf("%d %d\n", *pgdir_walk(kpgdir, p, 0), *p);
     while (1) ;
 }
