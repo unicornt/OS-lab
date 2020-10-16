@@ -4,8 +4,14 @@
 #include "string.h"
 #include "console.h"
 #include "kalloc.h"
+<<<<<<< HEAD
 #include "trap.h"
 #include "timer.h"
+=======
+#include "kpgdir.c"
+#include "kalloc.h"
+#include "vm.h"
+>>>>>>> add test code
 
 void
 main()
