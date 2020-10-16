@@ -1,9 +1,8 @@
 #include <stdint.h>
 
+#include "mmu.h"
 #include "string.h"
 #include "console.h"
-#include "kalloc.h"
-#include "kpgdir.c"
 #include "kalloc.h"
 #include "vm.h"
 
@@ -25,9 +24,14 @@ main()
     cprintf("Allocator: Init success.\n");
     check_free_list();
     uint64_t *p = kalloc();
-    map_region(kpgdir, 0, 1024, p, 0);
-    cprintf("%d %d\n", *pgdir_walk(kpgdir, p, 0), *p);
-    vm_free(kpgdir, 0);
-    cprintf("%d %d\n", *pgdir_walk(kpgdir, p, 0), *p);
+    uint64_t *pgdir = kalloc();
+    memset(pgdir, 0, PGSIZE);
+    map_region(pgdir,  0, PGSIZE, V2P(p), 0);
+    memset(p, 0xFF, PGSIZE);
+    asm volatile("adr x9, pgdir");
+    asm volatile("msr ttbr0_el1, x9");
+    for(int i = 0;i  < PGSIZE; i++) {
+        if(*((int*) i) != 0xFF) cprintf("error in %d\n", i);
+    }
     while (1) ;
 }
