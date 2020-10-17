@@ -32,7 +32,7 @@ pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
             pgdir = (uint64_t*) P2V(PTE_ADDR(*pte));
         }
         else {
-            if(alloc == 0 || (pgdir = kalloc()) == 0) return NULL; // not allowed to alloc or fail to alloc
+            if(alloc == 0 || (pgdir = (uint64_t*)kalloc()) == 0) return NULL; // not allowed to alloc or fail to alloc
             memset(pgdir, 0, PGSIZE); // init the new page
             *pte = V2P(*pgdir) | PTE_P | PTE_RW | PTE_USER;
         }
@@ -50,7 +50,9 @@ pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
  * Hint: call pgdir_walk to get the corresponding page table entry
  */
 
-static int
+//delete static for debug
+/* static */
+int
 map_region(uint64_t *pgdir, void *va, uint64_t size, uint64_t pa, int64_t perm)
 {
     /* TODO: Your code here. */
@@ -89,6 +91,6 @@ vm_free(uint64_t *pgdir, int level)
             kfree(v);
         }
     }
-    kfree(pgdir);
+    kfree((char*)pgdir);
     /* My code ends */
 }
