@@ -29,9 +29,12 @@ main()
     memset(pgdir, 0, PGSIZE);
     map_region(pgdir, (void*)0, (uint64_t)PGSIZE, V2P(p), 0);
     memset(p, 0xFF, PGSIZE);
-    asm volatile("msr ttbr0_el1, %[x]": : [x]"r"(pgdir));
+    asm volatile("msr ttbr0_el1, %[x]": : [x]"r"(V2P(pgdir))); 
     for(uint64_t i = 0;i  < PGSIZE; i++) {
-        if((*(int*)i) != 0xFF) cprintf("error in %d\n", i);
+        if((*(int*)i) != 0xFF){
+            asm volatile("msr ttbr0_el1, %[x]": : [x]"r"(kpgdir)); 
+            cprintf("error in %d\n", i);
+        }
     }
     cprintf("testing finish");
     while (1) ;
