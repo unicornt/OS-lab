@@ -26,18 +26,23 @@ pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
 {  //pgdir point to the start entry of given page table
     /* TODO: Your code here. */
     if((uint64_t)va >= (1L << 50)) panic("virtual memory limit exceed");
+    uint64_t *pg = pgdir;
     for(int level = 0; level < 4; level++) {
-        uint64_t *pte = &pgdir[PTX(level, va)]; // pte point to target entry in this page table
+        cprintf("%x %d\n", pg, level);
+        uint64_t *pte = &pg[PTX(level, va)]; // pte point to target entry in this page table
         if(*pte & PTE_P) { // check valid
-            pgdir = (uint64_t*) P2V(PTE_ADDR(*pte));
+            cprintf("valid table\n");
+            pg = (uint64_t*) P2V(PTE_ADDR(*pte));
         }
         else {
-            if(alloc == 0 || (pgdir = (uint64_t*)kalloc()) == 0) return NULL; // not allowed to alloc or fail to alloc
-            memset(pgdir, 0, PGSIZE); // init the new page
-            *pte = V2P(*pgdir) | PTE_P | PTE_RW | PTE_USER;
+            cprintf("new table\n");
+            if(alloc == 0 || (pg = (uint64_t*)kalloc()) == 0) return NULL; // not allowed to alloc or fail to alloc
+            memset(pg, 0, PGSIZE); // init the new page
+            *pte = V2P(pg) | PTE_P | PTE_RW | PTE_USER;
+            cprintf("alloc %x %x %x\n", pte, *pte, V2P(pg));
         }
     }
-    return &pgdir[PTX(4, va)];
+    return &pg[(uint64_t)va & 0xFFF];
     /* My code ends. */
 }
 
@@ -58,10 +63,11 @@ map_region(uint64_t *pgdir, void *va, uint64_t size, uint64_t pa, int64_t perm)
     /* TODO: Your code here. */
     char* startp = ROUNDDOWN(va, PGSIZE);
     char* endp = ROUNDDOWN(va + size - 1, PGSIZE);
+    cprintf("%d %d\n", startp, endp);
     for(char* i = startp; i <= endp; i += PGSIZE, pa += PGSIZE) {
         uint64_t *pte = pgdir_walk(pgdir, i, 1);
-        if(*pte & PTE_P) panic("map to an alloced region");
         *pte = pa | perm | PTE_P | PTE_TABLE | PTE_AF;
+        cprintf("pte  %x: %x\n", pte, PTE_ADDR(*pte));
     }
     return 0;
     /* My code ends */
