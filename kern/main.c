@@ -1,24 +1,12 @@
 #include <stdint.h>
 
-<<<<<<< HEAD
 #include "arm.h"
 #include "string.h"
 #include "console.h"
 #include "kalloc.h"
-<<<<<<< HEAD
 #include "trap.h"
 #include "timer.h"
-=======
-#include "kpgdir.c"
-#include "kalloc.h"
-=======
-#include "mmu.h"
-#include "string.h"
-#include "console.h"
-#include "kalloc.h"
->>>>>>> update test code
 #include "vm.h"
->>>>>>> add test code
 
 void
 main()
