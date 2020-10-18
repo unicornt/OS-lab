@@ -67,7 +67,7 @@ kalloc()
     struct run *p = kmem.free_list;
 //    memset(p, 2, PGSIZE); // init page for debug. // init like this will overwrite p->next
     kmem.free_list = p -> next;
-    memset(p, 0, PGSIZE);
+    memset(p, 2, PGSIZE);
     return (char *)p;
     /* My code ends. */
 }
