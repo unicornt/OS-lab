@@ -21,7 +21,7 @@
  *     a pointer into the new page table page.
  */
 
-static uint64_t *
+/*static */uint64_t *
 pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
 {  //pgdir point to the start entry of given page table
     /* TODO: Your code here. */
@@ -29,7 +29,7 @@ pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
     uint64_t *pg = pgdir;
     for(int level = 0; level < 4; level++) {
         cprintf("%x %d\n", pg, level);
-        uint64_t *pte = &pg[PTX(level, va)]; // pte point to target entry in this page table
+        uint64_t *pte = &pg[PTX(level, va) << 3]; // pte point to target entry in this page table
         if(*pte & PTE_P) { // check valid
             cprintf("valid table\n");
             pg = (uint64_t*) P2V(PTE_ADDR(*pte));

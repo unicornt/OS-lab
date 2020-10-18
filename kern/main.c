@@ -30,6 +30,9 @@ main()
     map_region(pgdir, (void*)0, (uint64_t)PGSIZE, V2P(p), 0);
     memset(p, 0xFF, PGSIZE);
     cprintf("p %x pgdir %x\n", p, pgdir);
+    uint64_t *pw = pgdir_walk(pgdir, 0, 0);
+    cprintf("pw %x %x\n", PTE_ADDR(*pw), *(int*)(PTE_ADDR(*pw)));
+    cprintf("pgdir_walk success!!\n");
     asm volatile("msr ttbr0_el1, %[x]": : [x]"r"(V2P(pgdir))); 
     for(uint64_t i = 0;i  < PGSIZE; i++) {
         cprintf("%d\n", i);
