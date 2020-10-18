@@ -35,7 +35,8 @@ main()
     cprintf("pgdir_walk success!!\n");
     asm volatile("msr ttbr0_el1, %[x]": : [x]"r"(V2P(pgdir))); 
     for(uint64_t i = 0;i  < PGSIZE; i++) {
-        cprintf("%d\n", i);
+        int* pt = (int*) i;
+        cprintf("%x\n", pt);
         if((*((int*)i)) != 0xFF){
             cprintf("error in %d\n", i);
         }
