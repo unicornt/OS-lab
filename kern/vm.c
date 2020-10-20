@@ -78,7 +78,6 @@ void
 vm_free(uint64_t *pgdir, int level)
 {
     /* TODO: Your code here. */
-    cprintf("vm pg  %x\n", pgdir);
     if(pgdir == 0) panic("pgdir not found");
     if(level < 3) {
         for(int i = 0; i < PGSIZE; i += 8) {
@@ -89,7 +88,7 @@ vm_free(uint64_t *pgdir, int level)
         }
     }
     else {
-        for(int i = 0; i < PGSIZE; i+=8) {
+        for(int i = 0; i < PGSIZE; i += 8) {
             uint64_t* pte = (uint64_t)pgdir | i;
             if(*pte & PTE_P) {
                 cprintf("%x\n", P2V(PTE_ADDR(*pte)));

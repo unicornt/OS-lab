@@ -38,7 +38,6 @@ kfree(char *v)
     memset(v, 1, PGSIZE);
     
     /* TODO: Your code here. */
-    for(int i = 0;i < PGSIZE; i++) if((*(char*)(v + i)) != 0x1) panic("kfree memset check");
     r = (struct run*) v;
     r -> next = kmem.free_list;
     kmem.free_list = r;
