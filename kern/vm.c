@@ -8,6 +8,7 @@
 #include "vm.h"
 #include "kalloc.h"
 
+extern char end[];//
 /* 
  * Given 'pgdir', a pointer to a page directory, pgdir_walk returns
  * a pointer to the page table entry (PTE) for virtual address 'va'.
@@ -77,18 +78,23 @@ void
 vm_free(uint64_t *pgdir, int level)
 {
     /* TODO: Your code here. */
+    cprintf("vm pg  %x\n", pgdir);
     if(pgdir == 0) panic("pgdir not found");
-    if(level < 4) {
-        for(int i = 0; i < PGSIZE; i++) {
-            if(pgdir[i] & PTE_P) {
-                vm_free(P2V(PTE_ADDR(pgdir[i])), level + 1);
+    if(level < 3) {
+        for(int i = 0; i < PGSIZE; i += 8) {
+            uint64_t *pte = (uint64_t)pgdir | i;
+            if(*pte & PTE_P) {
+                vm_free(P2V(PTE_ADDR(*pte)), level + 1);
             }
         }
     }
     else {
-        for(int i = 0; i < PGSIZE; i++) {
-            char* v = &pgdir[i];
-            kfree(v);
+        for(int i = 0; i < PGSIZE; i+=8) {
+            uint64_t* pte = (uint64_t)pgdir | i;
+            if(*pte & PTE_P) {
+                cprintf("%x\n", P2V(PTE_ADDR(*pte)));
+                kfree(P2V(PTE_ADDR(*pte))); // need to check valid
+            }
         }
     }
     kfree((char*)pgdir);
