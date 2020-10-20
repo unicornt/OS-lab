@@ -28,16 +28,13 @@ main()
     memset(pgdir, 0, PGSIZE);
     map_region(pgdir, (void*)0, (uint64_t)PGSIZE, V2P(p), 0);
     memset(p, 0xFF, PGSIZE);
-    uint64_t *pw = pgdir_walk(pgdir, 0, 0);
     asm volatile("msr ttbr0_el1, %[x]": : [x]"r"(V2P(pgdir))); 
-    cprintf("0:   %x\n", *(int*)0);
-    /*for(uint64_t i = 0;i  < PGSIZE; i++) {
-        int* pt = (int*) i;
-        cprintf("%x\n", *pt);
-        if((*((int*)i)) != 0xFF){
-            cprintf("error in %d\n", i);
+    cprintf("start test\n");
+    for(uint64_t i = 0;i  < PGSIZE; i++) {
+        if((*((char*)i)) != 0xFF){
+            cprintf("error in %d : %x\n", i, *((char*)i));
         }
-    }*/
-    cprintf("testing finish");
+    }
+    cprintf("testing finish\n");
     while (1) ;
 }
