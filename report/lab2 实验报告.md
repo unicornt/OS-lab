@@ -44,7 +44,9 @@ lab2主要实现的是内核的内存管理，需要实现的函数有 kalloc，
 
 ​	当前实现的页表一共四级，每级 9 位，最后 12 位用来在最后一页定位。这样的设计是因为四级页表中的 PTE 是 64 位的，因此每个 PTE 需要占用 8 byte，也就是最后 3 位的定位是不需要的，因此只需要 9 位数字来寻址。
 
-​	这也能解释在 pgdir_walk 中 PTE 的定位是 `(uint64_t)pg | (PTX(level, va) << 3)` 而不是 `(uint64_t)pg | PTX(level, va)`。同理，在 vm_free 中，逐个查询 PTE 是 8 位一次进行的。
+​	~~这也能解释在 pgdir_walk 中 PTE 的定位是 `(uint64_t)pg | (PTX(level, va) << 3)` 而不是 `(uint64_t)pg | PTX(level, va)`。同理，在 vm_free 中，逐个查询 PTE 是 8 位一次进行的。~~
+
+​	由于 pg 是 uint64_t 类型的指针，所以不需要左移 3 位再进行寻址。同理，vm_free 中不需要 8 位一次进行查询。如果 pg 是 char\* 类型的话应该是需要左移的。
 
 ### 清空问题
 
