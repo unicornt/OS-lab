@@ -42,7 +42,7 @@ main()
     cprintf("start testing vm_free\n");
     vm_free(pgdir, 0);
     cprintf("p %x\n", p);
-    for(int i = 8;i < PGSIZE; i++) { // first 8 bytes are next free list information
+    for(int i = 8;i < (PGSIZE >> 3); i++) { // first 8 bytes are next free list information
         if((*((char*)((uint64_t)p + i))) != 0x1) {
             cprintf("error in %d : %x\n", i, *(char*)((uint64_t)p +i ));
         }

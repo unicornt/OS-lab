@@ -29,7 +29,7 @@ pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
     if((uint64_t)va >= (1L << 50)) panic("virtual memory limit exceed");
     uint64_t *pg = pgdir;
     for(int level = 0; level < 3; level++) {
-        uint64_t *pte = (uint64_t)pg | (PTX(level, va)); // pte point to target entry in this page table
+        uint64_t *pte = &pg[PTX(level, va)]; // pte point to target entry in this page table
         if(*pte & PTE_P) { // check valid
             pg = (uint64_t*) P2V(PTE_ADDR(*pte));
         }
@@ -39,7 +39,7 @@ pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
             *pte = V2P(pg) | PTE_TABLE | PTE_P;
         }
     }
-    return (uint64_t)pg | (PTX(3, va));
+    return &pg[PTX(3, va)];
     /* My code ends. */
 }
 
@@ -80,18 +80,18 @@ vm_free(uint64_t *pgdir, int level)
     /* TODO: Your code here. */
     if(pgdir == 0) panic("pgdir not found");
     if(level < 3) {
-        for(int i = 0; i < PGSIZE; i ++) {
-            uint64_t *pte = (uint64_t)pgdir | i;
+        for(int i = 0; i < (PGSIZE >> 3); i++) {
+            uint64_t *pte = &pgdir[i];
             if(*pte & PTE_P) {
                 vm_free(P2V(PTE_ADDR(*pte)), level + 1);
             }
         }
     }
     else {
-        for(int i = 0; i < PGSIZE; i ++) {
-            uint64_t* pte = (uint64_t)pgdir | i;
+        for(int i = 0; i < (PGSIZE >> 3); i++) {
+            uint64_t* pte = &pgdir[i];
             if(*pte & PTE_P) {
-                cprintf("%x\n", P2V(PTE_ADDR(*pte)));
+                //cprintf("%x\n", P2V(PTE_ADDR(*pte)));
                 kfree(P2V(PTE_ADDR(*pte))); // need to check valid
             }
         }
