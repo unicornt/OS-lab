@@ -32,5 +32,8 @@ main()
     lvbar(vectors);
     timer_init();
 
+    cprintf("init finish\n");
+    sti();
+    cprintf("test finish\n");
     while (1) ;
 }
