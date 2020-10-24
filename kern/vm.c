@@ -22,7 +22,7 @@ extern char end[];//
  *     a pointer into the new page table page.
  */
 
-/*static */uint64_t *
+static uint64_t *
 pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
 {  //pgdir point to the start entry of given page table
     /* TODO: Your code here. */
@@ -53,8 +53,7 @@ pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
  */
 
 //delete static for debug
-/* static */
-int
+static int
 map_region(uint64_t *pgdir, void *va, uint64_t size, uint64_t pa, int64_t perm)
 {
     /* TODO: Your code here. */
