@@ -12,12 +12,7 @@ alltraps:
      */
 
     /* TODO: Your code here. */
-    stp x30, x29, [sp, #-16]!
-    stp x28, x27, [sp, #-16]!
-    stp x26, x25, [sp, #-16]!
-    stp x24, x23, [sp, #-16]!
-    stp x22, x21, [sp, #-16]!
-    stp x20, x19, [sp, #-16]!
+    stp x30, x0, [sp, #-16]!
     stp x18, x17, [sp, #-16]!
     stp x16, x15, [sp, #-16]!
     stp x14, x13, [sp, #-16]!
@@ -67,11 +62,6 @@ trapret:
     ldp x13, x14, [sp], #16
     ldp x15, x16, [sp], #16
     ldp x17, x18, [sp], #16
-    ldp x19, x20, [sp], #16
-    ldp x21, x22, [sp], #16
-    ldp x23, x24, [sp], #16
-    ldp x25, x26, [sp], #16
-    ldp x27, x28, [sp], #16
-    ldp x29, x30, [sp], #16
+    ldp x30, x0, [sp], #16
     /* My code ends here */
     eret
