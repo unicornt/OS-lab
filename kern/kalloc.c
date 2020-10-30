@@ -31,14 +31,17 @@ void
 kfree(char *v)
 {
     struct run *r;
-
     if ((uint64_t)v % PGSIZE || v < end || V2P(v) >= PHYSTOP)
         panic("kfree");
-
+        
     /* Fill with junk to catch dangling refs. */
     memset(v, 1, PGSIZE);
     
     /* TODO: Your code here. */
+    r = (struct run*) v;
+    r -> next = kmem.free_list;
+    kmem.free_list = r;
+    /* My code ends. */
 }
 
 void
@@ -59,6 +62,13 @@ char *
 kalloc()
 {
     /* TODO: Your code here. */
+    if(kmem.free_list == NULL) return 0;
+    struct run *p = kmem.free_list;
+//    memset(p, 2, PGSIZE); // init page for debug. // init like this will overwrite p->next
+    kmem.free_list = p -> next;
+    memset(p, 2, PGSIZE);
+    return (char *)p;
+    /* My code ends. */
 }
 
 void
