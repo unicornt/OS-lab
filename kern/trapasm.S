@@ -26,7 +26,7 @@ alltraps:
     mrs x11, ELR_EL1
     stp x11, x10, [sp, #-16]!
     mrs x10, SPSR_EL1
-    stp x11, x10 [sp, #-16]!
+    stp x11, x10, [sp, #-16]!
     /* My code ends here. */
     /*
      * Call trap(struct *trapframe).
@@ -48,7 +48,7 @@ trapret:
      */
 
     /* TODO: Your code here. */
-    ldr x11, x10, [sp], #16
+    ldp x11, x10, [sp], #16
     msr SPSR_EL1, x10
     ldp x11, x10, [sp], #16
     msr ELR_EL1, x11

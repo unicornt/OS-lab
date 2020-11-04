@@ -8,6 +8,8 @@
 #include "timer.h"
 #include "spinlock.h"
 
+static int ex = -1;
+static struct spinlock lk;
 void
 main()
 {
@@ -17,7 +19,6 @@ main()
      */
 
     extern char edata[], end[], vectors[];
-
     /*
      * Determine which functions in main can only be
      * called once, and use lock to guarantee this.
@@ -26,16 +27,20 @@ main()
 
     /* TODO: Use `memset` to clear the BSS section of our program. */
     memset(edata, 0, end - edata);    
+    acquire(&lk);
+    cprintf("cpu %d get lock\n", cpuid());
+    if(ex == -1){
+        ex = cpuid();
     /* TODO: Use `cprintf` to print "hello, world\n" */
-    console_init();
-    alloc_init();
-    cprintf("Allocator: Init success.\n");
-    check_free_list();
-
-    irq_init();
-
-    lvbar(vectors);
-    timer_init();
+        console_init(); // operation on memory, only need to excute once
+        alloc_init(); // same as above
+        cprintf("Allocator: Init success.\n");
+        check_free_list(); // same as above
+        irq_init(); // the same
+    }
+    release(&lk);
+    lvbar(vectors); // operation about system register, each cpu has to excute
+    timer_init();  // operation about system register and different parts of memory 
 
     cprintf("CPU %d: Init success.\n", cpuid());
 
