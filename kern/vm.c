@@ -21,6 +21,7 @@ extern char end[];//
  *   - Otherwise, the new page is cleared, and pgdir_walk returns
  *     a pointer into the new page table page.
  */
+static struct spinlock pgdirlk;
 
 static uint64_t *
 pgdir_walk(uint64_t *pgdir, const void *va, int64_t alloc)
@@ -60,8 +61,10 @@ map_region(uint64_t *pgdir, void *va, uint64_t size, uint64_t pa, int64_t perm)
     char* startp = ROUNDDOWN(va, PGSIZE);
     char* endp = ROUNDDOWN(va + size - 1, PGSIZE);
     for(char* i = startp; i <= endp; i += PGSIZE, pa += PGSIZE) {
+        acquire(&pgdirlk);
         uint64_t *pte = pgdir_walk(pgdir, i, 1);
         *pte = pa | perm | PTE_P | PTE_TABLE | PTE_AF;
+        release(&pgdirlk);
     }
     return 0;
     /* My code ends */
@@ -80,21 +83,29 @@ vm_free(uint64_t *pgdir, int level)
     if(pgdir == 0) panic("pgdir not found");
     if(level < 3) {
         for(int i = 0; i < (PGSIZE >> 3); i++) {
+            acquire(&pgdirlk);
             uint64_t *pte = &pgdir[i];
             if(*pte & PTE_P) {
+                release(&pgdirlk);
                 vm_free(P2V(PTE_ADDR(*pte)), level + 1);
             }
+            release(&pgdirlk);
         }
     }
     else {
         for(int i = 0; i < (PGSIZE >> 3); i++) {
+            acquire(&pgdirlk);
             uint64_t* pte = &pgdir[i];
             if(*pte & PTE_P) {
+                release(&pgdirlk);
                 //cprintf("%x\n", P2V(PTE_ADDR(*pte)));
                 kfree(P2V(PTE_ADDR(*pte))); // need to check valid
             }
+            release(&pgdirlk);
         }
     }
+    acquire(&pgdirlk);
     kfree((char*)pgdir);
+    release(&pgdirlk);
     /* My code ends */
 }

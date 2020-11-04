@@ -26,6 +26,7 @@ alloc_init()
     free_range(end, P2V(PHYSTOP));
 }
 
+static struct spinlock vlk;
 /* Free the page of physical memory pointed at by v. */
 void
 kfree(char *v)
@@ -58,6 +59,7 @@ free_range(void *vstart, void *vend)
  * Returns a pointer that the kernel can use.
  * Returns 0 if the memory cannot be allocated.
  */
+static struct spinlock kmemlk;
 char *
 kalloc()
 {
