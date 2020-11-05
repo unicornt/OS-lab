@@ -66,13 +66,19 @@ char *
 kalloc()
 {
     /* TODO: Your code here. */
+<<<<<<< HEAD
     acquire(&kmemlk);
+=======
+>>>>>>> a75404a9cba6d3ce3a822c506e607f93ec00e5e4
     if(kmem.free_list == NULL) return 0;
     struct run *p = kmem.free_list;
 //    memset(p, 2, PGSIZE); // init page for debug. // init like this will overwrite p->next
     kmem.free_list = p -> next;
     memset(p, 2, PGSIZE);
+<<<<<<< HEAD
     release(&kmemlk);
+=======
+>>>>>>> a75404a9cba6d3ce3a822c506e607f93ec00e5e4
     return (char *)p;
     /* My code ends. */
 }
@@ -88,5 +94,8 @@ check_free_list()
     for (p = kmem.free_list; p; p = p->next) {
         assert((void *)p > (void *)end);
     }
+<<<<<<< HEAD
     release(&kmemlk);
+=======
+>>>>>>> a75404a9cba6d3ce3a822c506e607f93ec00e5e4
 }
