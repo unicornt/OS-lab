@@ -9,7 +9,7 @@
 #include "spinlock.h"
 
 static int ex = -1;
-static struct spinlock lk;
+static struct spinlock lk = {0};
 void
 main()
 {
@@ -26,11 +26,13 @@ main()
     /* TODO: Your code here. */
 
     /* TODO: Use `memset` to clear the BSS section of our program. */
-    memset(edata, 0, end - edata);    
     acquire(&lk);
-    cprintf("cpu %d get lock\n", cpuid());
-    if(ex == -1){
+    if(ex == -1){    
         ex = cpuid();
+    }
+    release(&lk);
+    if(ex == cpuid()){
+        memset(edata, 0, end - edata);
     /* TODO: Use `cprintf` to print "hello, world\n" */
         console_init(); // operation on memory, only need to excute once
         alloc_init(); // same as above
@@ -38,7 +40,6 @@ main()
         check_free_list(); // same as above
         irq_init(); // the same
     }
-    release(&lk);
     lvbar(vectors); // operation about system register, each cpu has to excute
     timer_init();  // operation about system register and different parts of memory 
 
