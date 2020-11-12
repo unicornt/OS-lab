@@ -9,7 +9,7 @@
 #include "spinlock.h"
 
 static int ex = -1;
-static struct spinlock lk = {0};
+static struct mcslock lk = {0, 0};
 void
 main()
 {
@@ -24,13 +24,11 @@ main()
      * called once, and use lock to guarantee this.
      */
     /* TODO: Your code here. */
-
+    struct mcslock lk_i;
     /* TODO: Use `memset` to clear the BSS section of our program. */
-    acquire(&lk);
-    if(ex == -1){    
-        ex = cpuid();
-    }
-    release(&lk);
+    mcs_acquire(&lk, &lk_i);
+    if(ex == -1) ex = cpuid();
+    mcs_release(&lk, &lk_i);
     if(ex == cpuid()){
         memset(edata, 0, end - edata);
     /* TODO: Use `cprintf` to print "hello, world\n" */
