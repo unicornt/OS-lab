@@ -1,0 +1,1 @@
+zip -r 18307130104-赵文轩-lab4.zip . -x ".git/*" "obj/*" "docs/*" "report/*" "zip.sh"
