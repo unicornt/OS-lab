@@ -27,25 +27,19 @@ alloc_init()
     free_range(end, P2V(PHYSTOP));
 }
 
-struct spinlock kmemlk;
 /* Free the page of physical memory pointed at by v. */
 void
 kfree(char *v)
 {
     struct run *r;
+
     if ((uint64_t)v % PGSIZE || v < end || V2P(v) >= PHYSTOP)
-        panic("kfree");
-        
+        panic("kfree\n");
+
     /* Fill with junk to catch dangling refs. */
     memset(v, 1, PGSIZE);
     
     /* TODO: Your code here. */
-    acquire(&kmemlk);
-    r = (struct run*) v;
-    r -> next = kmem.free_list;
-    kmem.free_list = r;
-    release(&kmemlk);
-    /* My code ends. */
 }
 
 void
@@ -66,27 +60,16 @@ char *
 kalloc()
 {
     /* TODO: Your code here. */
-    acquire(&kmemlk);
-    if(kmem.free_list == NULL) return 0;
-    struct run *p = kmem.free_list;
-//    memset(p, 2, PGSIZE); // init page for debug. // init like this will overwrite p->next
-    kmem.free_list = p -> next;
-    memset(p, 2, PGSIZE);
-    release(&kmemlk);
-    return (char *)p;
-    /* My code ends. */
 }
 
 void
 check_free_list()
 {
     struct run *p;
-    acquire(&kmemlk);
     if (!kmem.free_list)
-        panic("'kmem.free_list' is a null pointer!");
+        panic("kmem.free_list is a null pointer!\n");
 
     for (p = kmem.free_list; p; p = p->next) {
         assert((void *)p > (void *)end);
     }
-    release(&kmemlk);
 }

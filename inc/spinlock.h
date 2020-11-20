@@ -1,27 +1,19 @@
 #ifndef INC_SPINLOCK_H
 #define INC_SPINLOCK_H
 
+#include "proc.h"
+
 struct spinlock {
     volatile int locked;
+    
+    /* For debugging: */
+    char        *name;      /* Name of lock. */
+    struct cpu  *cpu;       /* The cpu holding the lock. */
 };
+
+int holding(struct spinlock *);
 void acquire(struct spinlock *);
 void release(struct spinlock *);
-
-struct mcslock {
-    volatile struct mcslock *next;
-    volatile int locked;
-};
-void mcs_acquire(struct mcslock *, struct mcslock *);
-void mcs_release(struct mcslock *, struct mcslock *);
-
-struct rwlock {
-    volatile struct spinlock r, w;
-    volatile int cnt;
-};
-void read_lock(struct rwlock *);
-void read_unlock(struct rwlock *);
-void write_lock(struct rwlock *);
-void write_unlock(struct rwlock *);
+void initlock(struct spinlock *, char *);
 
 #endif
-

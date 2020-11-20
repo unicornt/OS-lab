@@ -7,9 +7,10 @@
 #include "trap.h"
 #include "timer.h"
 #include "spinlock.h"
+#include "proc.h"
 
-static int ex = -1;
-static struct mcslock lk = {0, 0};
+struct cpu cpus[NCPU];
+
 void
 main()
 {
@@ -19,29 +20,30 @@ main()
      */
 
     extern char edata[], end[], vectors[];
+
     /*
      * Determine which functions in main can only be
      * called once, and use lock to guarantee this.
      */
     /* TODO: Your code here. */
-    struct mcslock lk_i;
+    
+    cprintf("main: [CPU%d] is init kernel\n", cpuid());
+
     /* TODO: Use `memset` to clear the BSS section of our program. */
-    mcs_acquire(&lk, &lk_i);
-    if(ex == -1) ex = cpuid();
-    mcs_release(&lk, &lk_i);
-    if(ex == cpuid()){
-        memset(edata, 0, end - edata);
-    /* TODO: Use `cprintf` to print "hello, world\n" */
-        console_init(); // operation on memory, only need to excute once
-        alloc_init(); // same as above
-        cprintf("Allocator: Init success.\n");
-        check_free_list(); // same as above
-        irq_init(); // the same
-    }
-    lvbar(vectors); // operation about system register, each cpu has to excute
-    timer_init();  // operation about system register and different parts of memory 
+    memset(edata, 0, end - edata);
+    console_init();
+    alloc_init();
+    cprintf("main: allocator init success.\n");
+    check_free_list();
 
-    cprintf("CPU %d: Init success.\n", cpuid());
+    irq_init();
+    proc_init();
+    user_init();
 
+    lvbar(vectors);
+    timer_init();
+
+    cprintf("main: [CPU%d] Init success.\n", cpuid());
+    scheduler();
     while (1) ;
 }
